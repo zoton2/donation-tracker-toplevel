@@ -1,59 +1,29 @@
+# Dockerfile for production.
+
+# Does some building that requires Node.
+FROM node:10 as builder
+WORKDIR /home/node/app
+COPY ./tracker/package*.json ./tracker/
+RUN cd tracker && yarn
+COPY . /home/node/app/
+RUN cd tracker && yarn build-css
+
+# The actual tracker is ran in this stage.
 FROM python:2.7
-
-RUN set -ex \
-  && for key in \
-    9554F04D7259F04124DE6B476D5A82AC7E37093B \
-    94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-    0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
-    FD3A5288F042B6850C66B31F09FE44734EB7990E \
-    71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-    DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-    B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-    C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-  ; do \
-    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-  done
-
-ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 9.5.0
-
-RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
-  && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-  && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
-  && grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
-  && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \
-  && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt
-
-RUN apt-get update && apt-get install -y \
-		gcc \
-		gettext \
-		mysql-client libmysqlclient-dev \
-		postgresql-client libpq-dev \
-		sqlite3 \
-		locales-all \
-	--no-install-recommends && rm -rf /var/lib/apt/lists/*
-
-RUN npm i -g yarn
-
-RUN mkdir -p /usr/src/app/tracker /usr/src/app/tracker_ui /usr/src/app/db
-COPY tracker/requirements.txt /usr/src/app/tracker/
-COPY tracker/package.json /usr/src/app/tracker/
-COPY tracker/yarn.lock /usr/src/app/tracker/
-RUN (cd /usr/src/app/tracker && pip install --no-cache-dir -r requirements.txt && yarn)
-
-COPY *.py *.json /usr/src/app/
-COPY tracker/ /usr/src/app/tracker/
-
-WORKDIR /usr/src/app
-
-RUN ["python", "manage.py", "migrate"]
-RUN ["python", "manage.py", "loaddata", "blank.json"]
-
-ARG superusername=admin
-ARG superuserpassword=password
-
-RUN python manage.py createsuperuser --noinput --email nobody@example.com --username ${superusername}
-RUN yes ${superuserpassword} | python manage.py changepassword ${superusername}
-
-EXPOSE 8080
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+RUN apt-get update && apt-get install -y nginx locales-all
+WORKDIR /var/www
+# If the db folder is not made, the setup fails later.
+RUN mkdir db
+COPY --from=builder /home/node/app /var/www
+COPY ./requirements.txt /var/www/
+COPY ./tracker/requirements.txt /var/www/tracker/
+COPY ./tracker.conf /etc/nginx/conf.d/
+RUN pip install gunicorn
+RUN pip install -r requirements.txt
+# Setup some Django stuff including a default admin user.
+RUN python manage.py migrate
+RUN python manage.py collectstatic --noinput
+RUN python manage.py createsuperuser --noinput --email nobody@example.com --username admin
+RUN yes password | python manage.py changepassword admin
+EXPOSE 8000
+CMD service nginx restart && gunicorn wsgi -b 0.0.0.0:8001
