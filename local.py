@@ -1,13 +1,9 @@
 import os
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'your.domain.name'];
-
-# this is used as part of the auto-mailing services to identify where
-# to redirect registration and password resets to
-DOMAIN = 'your.domain.name'
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'];
 
 # Leave this as true during development, so that you get error pages describing what went wrong
-DEBUG = True
+DEBUG = False
 
 # You can add your e-mail if you want to receive notifications of failures I think , but its probably not a good idea
 ADMINS = [
@@ -27,8 +23,6 @@ TIME_ZONE = 'America/New_York'
 
 # set this to your site's prefix, This allows handling multiple deployments from a common url base
 SITE_PREFIX = '/'
-
-SECRET_KEY = 'IHaveNoIdeaWhatThisIsOrWhatItDoes'
 
 STATICFILES_DIRS = (
   os.path.abspath('tracker/static/'),

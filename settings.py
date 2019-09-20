@@ -1,9 +1,6 @@
 # Django settings for donations project.
 
-try:
-    import local
-except ImportError:
-    import example_local as local
+import local
 from django.core.urlresolvers import reverse
 import itertools
 import os
@@ -12,9 +9,12 @@ BASE_DIR = os.path.dirname(__file__)
 
 DEBUG = local.DEBUG
 
-ALLOWED_HOSTS = local.ALLOWED_HOSTS
+hosts = local.ALLOWED_HOSTS
+if os.environ.get('TRACKER_DOMAIN'):
+    hosts.append(os.environ.get('TRACKER_DOMAIN'))
+ALLOWED_HOSTS = hosts
 
-DOMAIN = local.DOMAIN
+DOMAIN = os.environ.get('TRACKER_DOMAIN')
 
 ADMINS = local.ADMINS
 
@@ -93,7 +93,10 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = local.SECRET_KEY
+if os.environ.get('TRACKER_SECRET_KEY'):
+    SECRET_KEY = os.environ.get('TRACKER_SECRET_KEY')
+else:
+    SECRET_KEY = 'SomeKeyGoesHere'
 
 TEMPLATES = [
     {

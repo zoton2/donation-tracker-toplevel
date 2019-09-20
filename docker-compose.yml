@@ -11,3 +11,6 @@ services:
     restart: always
     ports:
       - 8000:8000/tcp
+    environment:
+      - TRACKER_DOMAIN=example.com
+      - TRACKER_SECRET_KEY=SomeKeyGoesHere
