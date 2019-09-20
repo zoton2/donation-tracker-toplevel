@@ -68,8 +68,6 @@ There are far too many different ways to deploy the server to go over every poss
 
 Note that node is NOT required to run the server in a production environment, it is ONLY needed to build the Javascript UI package. You can build it locally and simply copy the necessary files to your server. *Don't forget the manifest file!*
 
-`PAYPAL_TEST` in the settings file will determine whether or not Paypal operates in sandbox mode. It is no longer possible to set this on a per-event basis.
-
 ## Docker (experimental, development environments only)
 
 Alternately, you can use [Docker](https://www.docker.com/). The packaged Dockerfile should build an isolated development environment for you, regardless of what OS you're on. While this is potentially the easiest to set up, it also has the most overhead. Note that this container is *NOT* intended for production use.
