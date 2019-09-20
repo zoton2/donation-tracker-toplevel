@@ -18,7 +18,7 @@ COPY --from=builder /home/node/app /var/www
 COPY ./requirements.txt /var/www/
 COPY ./tracker/requirements.txt /var/www/tracker/
 COPY ./tracker.conf /etc/nginx/conf.d/
-RUN pip install gunicorn
+RUN pip install uwsgi
 RUN pip install -r requirements.txt
 # Setup some Django stuff including a default admin user.
 RUN python manage.py migrate
@@ -26,4 +26,4 @@ RUN python manage.py collectstatic --noinput
 RUN python manage.py createsuperuser --noinput --email nobody@example.com --username admin
 RUN yes password | python manage.py changepassword admin
 EXPOSE 8000
-CMD service nginx restart && gunicorn wsgi -b 0.0.0.0:8001
+CMD service nginx restart && uwsgi --socket :8001 --module wsgi

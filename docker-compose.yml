@@ -1,0 +1,13 @@
+version: "3"
+
+volumes:
+  db:
+
+services:
+  app:
+    image: zoton2/donation-tracker:latest
+    volumes:
+      - db:/var/www/db
+    restart: always
+    ports:
+      - 8000:8000/tcp

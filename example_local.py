@@ -1,6 +1,6 @@
 import os
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', 'your.domain.name'];
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'your.domain.name'];
 
 # this is used as part of the auto-mailing services to identify where
 # to redirect registration and password resets to
