@@ -19,8 +19,6 @@ DATABASES = {
   },
 }
 
-TIME_ZONE = 'America/New_York'
-
 # set this to your site's prefix, This allows handling multiple deployments from a common url base
 SITE_PREFIX = '/'
 

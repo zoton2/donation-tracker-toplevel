@@ -10,7 +10,8 @@ services:
       - db:/var/www/db
     restart: always
     ports:
-      - 8000:8000/tcp
+      - 127.0.0.1:8000:8000/tcp
     environment:
       - TRACKER_DOMAIN=example.com
       - TRACKER_SECRET_KEY=SomeKeyGoesHere
+      - TRACKER_TIME_ZONE=Europe/Stockholm
