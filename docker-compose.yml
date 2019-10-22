@@ -4,7 +4,7 @@ volumes:
   db:
 
 services:
-  app:
+  tracker:
     image: zoton2/donation-tracker:latest
     volumes:
       - db:/var/www/db
@@ -15,3 +15,10 @@ services:
       - TRACKER_DOMAIN=example.com
       - TRACKER_SECRET_KEY=SomeKeyGoesHere
       - TRACKER_TIME_ZONE=Europe/Stockholm
+  repeater:
+    image: zoton2/donation-tracker:repeater-latest
+    restart: always
+    ports:
+      - 127.0.0.1:8080:8080/tcp
+    environment:
+      - REPEATER_SECRET_KEY=SomeKeyGoesHere
