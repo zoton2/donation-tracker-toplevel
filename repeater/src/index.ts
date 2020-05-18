@@ -24,11 +24,11 @@ app.get('/', (req, res) => {
 
 // This is where the tracker postbacks are received.
 app.post('/', (req, res) => {
-	// Reject POSTs without the correct key.
-	if (req.query.key !== key) {
-		res.sendStatus(403);
-		return;
-	}
+  // Reject POSTs without the correct key.
+  if (req.query.key !== key) {
+    res.sendStatus(403);
+    return;
+  }
 
   // Donation pushes, from when they are approved to be shown on stream.
   if (req.body.message_type === 'donation_push') {
