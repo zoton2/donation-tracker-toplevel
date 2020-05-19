@@ -1,7 +1,7 @@
 # Dockerfile for production.
 
 # Does some building that requires Node.
-FROM node:10 as builder
+FROM node:12 as builder
 WORKDIR /home/node/app
 COPY ./tracker/package*.json ./tracker/
 RUN cd tracker && yarn
